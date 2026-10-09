@@ -34,35 +34,61 @@ score and provide a recommended credit-limit action.
 
 ## Workflow
 
-``` mermaid
+```mermaid
 flowchart TD
-    A[Start] --> B[Read Client Excel File]
-    B --> C[Extract Unique Client Names]
-    C --> D[Launch Selenium Browser]
-    D --> E[Login to Admin Portal]
-    E --> F[Search and Open Client]
-    F --> G[Collect Monthly Balances]
-    G --> H[Calculate Balance Trend]
-    H --> I[Collect Borrowing Activity]
-    I --> J[Identify Large and Non-Plexe Borrowing]
-    J --> K[Collect Repayment Data]
-    K --> L[Collect Latest FICO Date]
-    L --> M[Open Latest FICO Report]
-    M --> N[Collect Latest FICO Score]
-    N --> O[Collect Credit Limit Adjustment History]
-    O --> P[Calculate Credit Limit Review Indicators]
-    P --> Q[Calculate Weighted Decision Score]
-    Q --> R{Decision}
-    R -->|Positive| S[Increase / Support Higher Limit]
-    R -->|Neutral| T[Keep Current Limit]
-    R -->|Negative| U[Reduce Limit]
-    S --> V[Generate Excel Output]
-    T --> V
-    U --> V
-    V --> W[Generate Review Dashboard]
-    W --> X[Complete]
-```
+    A[Start Credit Limit Review] --> B[Load Client List]
+    B --> C[Open Client in Admin Portal]
+    C --> D[Collect Client Data]
 
+    D --> E[Monthly Balances]
+    D --> F[Borrowing Activity]
+    D --> G[Repayment Performance]
+    D --> H[Latest FICO Score & Date]
+    D --> I[Credit Limit History]
+
+    E --> E1[Calculate Balance Level]
+    E --> E2[Calculate Balance Trend]
+
+    F --> F1[Evaluate Large Borrowing]
+    F --> F2[Evaluate Non-Plexe Borrowing]
+
+    G --> G1[Evaluate Repayment]
+
+    E1 --> J[Assign Component Score]
+    E2 --> J
+    F1 --> J
+    F2 --> J
+    G1 --> J
+    H --> J
+    I --> J
+
+    J --> K[Apply Decision Weights]
+    K --> L[Calculate Weighted Decision Score]
+    L --> M{Decision Score}
+
+    M -->|Score >= +0.20| N[INCREASE]
+    M -->|Score <= -0.20| O[REDUCE]
+    M -->|Between -0.20 and +0.20| P[KEEP]
+
+    N --> Q[Calculate Estimated Credit Limit]
+    O --> Q
+
+    Q --> R[Apply Maximum Limit Change]
+    R --> S[Round Recommended Limit]
+
+    P --> T[Keep Current Credit Limit]
+
+    S --> U[Final Credit Limit Recommendation]
+    T --> U
+
+    U --> V[Save Results to Excel]
+    V --> W[Generate Client Report]
+    W --> X[End]
+
+    classDef default fill:#e3f2fd,stroke:#cbd5e1,color:#07549b,stroke-width:1px;
+    classDef decision fill:#f4faff,stroke:#94a3b8,color:#07549b,stroke-width:1px;
+    class M decision;
+```
 ## Credit Limit Decision Logic
 
 The review uses configurable decision components:
